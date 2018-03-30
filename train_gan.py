@@ -129,13 +129,14 @@ def main(_):
                             time.time() - start_time, d_err, g_err))
                 
                 summary = sess.run(merged, feed_dict={x: batch_x, z: batch_z})
-                    summary_writer.add_summary(summary, epoch)
+                summary_writer.add_summary(summary, epoch)
                 print("Epoch:", '%04d' % (epoch+1), "d_cost=", \
                           "{:.9f}".format(d_total_cost/num_batches), "g_cost=", "{:.9f}".format(g_total_cost/num_batches))
     
                 sys.stdout.flush()
         save_path = saver.save(sess, save_dir)
         print("Model saved in path: %s" % save_path)
+        sys.stdout.flush()
     sess.close()
     
 
