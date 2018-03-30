@@ -123,7 +123,7 @@ def main(_):
                     d_total_cost += d_err
                     g_total_cost += g_err
                     
-                    if(batch_i % 30 == 0)
+                    if batch_i % 30 == 0:
                         summary = sess.run(merged, feed_dict={x: batch_x, z: batch_z})
                         summary_writer.add_summary(summary, epoch)
                     
