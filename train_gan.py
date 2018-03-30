@@ -89,7 +89,7 @@ def main(_):
               
         saver = tf.train.Saver()
         
-    with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
+    with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options, allow_soft_placement=True)) as sess:
         
         print("starting session")
         summary_writer = tf.summary.FileWriter(FLAGS.summaries_dir + '/train', sess.graph)
@@ -123,13 +123,15 @@ def main(_):
                     d_total_cost += d_err
                     g_total_cost += g_err
                     
+                    if(batch_i % 30 == 0)
+                        summary = sess.run(merged, feed_dict={x: batch_x, z: batch_z})
+                        summary_writer.add_summary(summary, epoch)
                     
                     print("Epoch: [%2d/%2d] [%4d/%4d] time: %4.4f, d_loss: %.8f, g_loss: %.8f" \
                         % (epoch, FLAGS.epoch, batch_i, num_batches,
                             time.time() - start_time, d_err, g_err))
                 
-                summary = sess.run(merged, feed_dict={x: batch_x, z: batch_z})
-                summary_writer.add_summary(summary, epoch)
+
                 print("Epoch:", '%04d' % (epoch+1), "d_cost=", \
                           "{:.9f}".format(d_total_cost/num_batches), "g_cost=", "{:.9f}".format(g_total_cost/num_batches))
     
