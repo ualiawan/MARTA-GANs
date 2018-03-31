@@ -86,10 +86,11 @@ def main(_):
         
         merged = tf.summary.merge_all()
         gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.30)
+        gpu_options.allow_growth = True
               
         saver = tf.train.Saver()
         
-    with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options, allow_soft_placement=True, allow_growth=True)) as sess:
+    with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options, allow_soft_placement=True)) as sess:
         
         print("starting session")
         summary_writer = tf.summary.FileWriter(FLAGS.summaries_dir + '/train', sess.graph)
