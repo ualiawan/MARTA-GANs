@@ -11,11 +11,12 @@ import utilities
 import time
 
 
-flags = tf.app.flags
+flags = tf.app.FLAGS
 
-tf.app.flags.DEFINE_integer("epoch", 30, "Epoch to train")
-flags.DEFINE_float("learning_rate", 0.0002, "Learning rate of for adam")
-flags.DEFINE_float("beta1", 0.5, "Momentum term of adam")
+
+flags.DEFINE_integer("epoch", 30, "Epoch to train")
+flags.DEFINE_float("learning_rate", 0.001, "Learning rate of for adam")
+flags.DEFINE_float("beta1", 0., "Momentum term of adam")
 flags.DEFINE_integer("train_size", sys.maxsize, "The size of train images")
 flags.DEFINE_integer("batch_size", 64, "The number of batch images")
 flags.DEFINE_integer("image_size", 256, "The size of image to use (will be center cropped)")
@@ -47,9 +48,9 @@ def main(_):
         z = tf.placeholder(tf.float32, [FLAGS.batch_size, FLAGS.z_dim], name="g_input_noise")
         x =  tf.placeholder(tf.float32, [FLAGS.batch_size, FLAGS.output_size, FLAGS.output_size, FLAGS.c_dim], name='d_input_images')
         
-        g_net, Gz =  network.generator(z)
-        d_netx, Dx, Dfx =  network.discriminator(x)
-        d_netz, Dz, Dfz = network.discriminator(Gz, reuse=True)
+        Gz =  network.generator(z)
+        Dx, Dfx =  network.discriminator(x)
+        Dz, Dfz = network.discriminator(Gz, reuse=True)
         
         
         d_loss_real = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=Dx, labels=tf.ones_like(Dx)))
@@ -64,11 +65,10 @@ def main(_):
         tvars = tf.trainable_variables()
         d_vars =  [var for var in tvars if 'd_' in var.name]
         g_vars =  [var for var in tvars if 'g_' in var.name]
-        
-        #g_net.print_params(False)
+
+        print(d_vars)
         print("---------------")
-        #d_netx.print_params(False)
-        
+        print(g_vars)
         
         with tf.variable_scope(tf.get_variable_scope(),reuse=False): 
             print("reuse or not: {}".format(tf.get_variable_scope().reuse))
@@ -81,7 +81,7 @@ def main(_):
         tf.summary.scalar("generator_loss_total", g_loss)
         tf.summary.scalar("discriminator_loss", d_loss)
         
-        _, images_for_tensorboard = network.generator(z, reuse=True)
+        images_for_tensorboard = network.generator(z, reuse=True)
         tf.summary.image('Generated_images', images_for_tensorboard, 2)
         
         merged = tf.summary.merge_all()
@@ -126,7 +126,7 @@ def main(_):
                     
                     if batch_i % 30 == 0:
                         summary = sess.run(merged, feed_dict={x: batch_x, z: batch_z})
-                        summary_writer.add_summary(summary, epoch)
+                        summary_writer.add_summary(summary, (epoch-1)*(num_batches/30)+(batch_i/30))
                     
                     print("Epoch: [%2d/%2d] [%4d/%4d] time: %4.4f, d_loss: %.8f, g_loss: %.8f" \
                         % (epoch, FLAGS.epoch, batch_i, num_batches,
@@ -140,8 +140,7 @@ def main(_):
         save_path = saver.save(sess, save_dir)
         print("Model saved in path: %s" % save_path)
         sys.stdout.flush()
-    sess.close()
-    
+    sess.close()   
 
 if __name__ == '__main__':
     tf.app.run()

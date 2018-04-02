@@ -83,7 +83,7 @@ def generator(inputs, is_train=True, reuse=False):
         #logits = h6.outputs
         #h6.outputs = tf.nn.tanh(h6.outputs)
         
-    return h6, tf.nn.tanh(h6)
+    return tf.nn.tanh(h6)
 
 def discriminator(inputs, is_train=True, reuse=False):
     kernel = 5
@@ -150,7 +150,7 @@ def discriminator(inputs, is_train=True, reuse=False):
         
         #logits =  h6.outputs
         #h6.outputs = tf.nn.sigmoid(h6.outputs)
-    return h6, tf.nn.sigmoid(h6), features
+    return tf.nn.sigmoid(h6), features
 
         
         
