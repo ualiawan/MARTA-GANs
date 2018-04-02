@@ -15,7 +15,7 @@ flags = tf.app.flags
 
 flags.DEFINE_integer("epoch", 30, "Epoch to train")
 flags.DEFINE_float("learning_rate", 0.001, "Learning rate of for adam")
-flags.DEFINE_float("beta1", 0., "Momentum term of adam")
+flags.DEFINE_float("beta1", 0.9, "Momentum term of adam")
 flags.DEFINE_integer("train_size", sys.maxsize, "The size of train images")
 flags.DEFINE_integer("batch_size", 64, "The number of batch images")
 flags.DEFINE_integer("image_size", 256, "The size of image to use (will be center cropped)")
@@ -79,6 +79,8 @@ def main(_):
         tf.summary.scalar("generator_loss_features", g_loss_features)
         tf.summary.scalar("generator_loss_total", g_loss)
         tf.summary.scalar("discriminator_loss", d_loss)
+        tf.summary.scalar("discriminator_loss_real", d_loss_real)
+        tf.summary.scalar("discriminator_loss_fake", d_loss_fake)
         
         images_for_tensorboard = network.generator(z, reuse=True)
         tf.summary.image('Generated_images', images_for_tensorboard, 2)
@@ -123,7 +125,7 @@ def main(_):
                     d_total_cost += d_err
                     g_total_cost += g_err
                     
-                    if batch_i % 30 == 0:
+                    if batch_i % 10 == 0:
                         summary = sess.run(merged, feed_dict={x: batch_x, z: batch_z})
                         summary_writer.add_summary(summary, (epoch-1)*(num_batches/30)+(batch_i/30))
                     
