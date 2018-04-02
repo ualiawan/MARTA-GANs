@@ -11,8 +11,7 @@ import utilities
 import time
 
 
-flags = tf.app.FLAGS
-
+flags = tf.app.flags
 
 flags.DEFINE_integer("epoch", 30, "Epoch to train")
 flags.DEFINE_float("learning_rate", 0.001, "Learning rate of for adam")
